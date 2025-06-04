@@ -72,6 +72,9 @@ ADD ./custom-php.ini /usr/local/etc/php/conf.d/custom-php.ini
 RUN a2enmod rewrite
 RUN a2enmod headers
 
+ENV APACHE_RUN_USER=www-data
+ENV APACHE_RUN_GROUP=www-data
+
 WORKDIR /var/www/html
 
 RUN chown -R www-data:www-data /var/www/html
@@ -80,3 +83,4 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
+USER www-data
