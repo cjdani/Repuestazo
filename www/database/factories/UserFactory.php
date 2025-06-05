@@ -34,6 +34,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'role' => $role,
             'desguace_id' => $role === 'empleado' ? Desguace::inRandomOrder()->value('id') : null,
+            'avatar' => 'fotos_perfil/default.svg',
         ];
     }
 

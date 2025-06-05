@@ -26,6 +26,7 @@ class ArticuloFactory extends Factory
             'marca' => $this->faker->company,
             'modelo' => $this->faker->word,
             'categoria' => $this->faker->word,
+            'imagen' => 'fotos_articulos/default.jpg',
         ];
     }
 }

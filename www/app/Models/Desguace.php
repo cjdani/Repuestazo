@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Desguace extends Model
 {
     use HasFactory;
+
+    public function empleados()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function articulos()
+    {
+        return $this->hasMany(Articulo::class);
+    }
+
 }

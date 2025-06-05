@@ -1,18 +1,54 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Request;
+use App\Http\Controllers\ArticuloController;
+use App\Http\Controllers\DesguaceController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('inicio');
+})->name('inicio');
 
-Route::get('/home', function () {
-    return view('home');
-});
+//Articulos
+Route::get('/articulos',
+    [ArticuloController::class, 'index']
+    )->name('articulos.index');
 
-Route::post('/home', function (Request $request) {
-    $email = $request->input('email');
-    $data['email'] = $email;
-    return view('home', $data);
-});
+Route::get('/articulos/{id}',
+    [ArticuloController::class, 'show']
+    )->name('articulos.show');
+
+//Desguaces
+Route::get('/desguaces',
+    [DesguaceController::class, 'index']
+    )->name('desguaces.index');
+
+Route::get('/desguaces/{id}',
+    [DesguaceController::class, 'show']
+    )->name('desguaces.show');
+
+//Usuarios
+Route::get('/usuario',
+    [UserController::class, 'show']
+    )->name('user.show');
+
+//Autenticación
+Route::get('/register',
+    [UserController::class, 'showRegister']
+)->name('register');
+
+Route::post('/register',
+    [UserController::class, 'doRegister']
+);
+
+Route::get('/login',
+    [UserController::class, 'showLogin']
+)->name('login');
+
+Route::post('/login',
+    [UserController::class, 'doLogin']
+);
+
+Route::get('/logout',
+    [UserController::class, 'logout']
+)->name('logout');

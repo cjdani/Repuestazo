@@ -9,5 +9,9 @@ class Articulo extends Model
 {
     use HasFactory;
 
-    //
+    public function desguace()
+    {
+        return $this->belongsTo(Desguace::class);
+    }
+
 }
