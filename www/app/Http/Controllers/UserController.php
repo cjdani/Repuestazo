@@ -15,6 +15,18 @@ class UserController extends Controller
         return view('users.show', compact('user'));
     }
 
+    public function index()
+    {
+        $users = User::with('desguace')->get();
+        return view('users.index', compact('users'));
+    }
+
+    public function showUserDetails($id)
+    {
+        $user = User::with('desguace')->findOrFail($id);
+        return view('users.show', compact('user'));
+    }
+
     public function showRegister()
     {
         return view('users.register');
@@ -26,7 +38,6 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|confirmed|min:6',
-            'password_confirmation' => '<PASSWORD>',
             'avatar' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048'
         ]);
 
@@ -35,24 +46,21 @@ class UserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'cliente',
-            'desguace_id'  => $validated['rol'] === 'empleado' ? $validated['desguace_id'] : null,
-            'avatar'       => 'fotos_perfil/default.svg',
+            'desguace_id' => null,
+            'avatar' => 'fotos_perfil/default.svg',
         ]);
 
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
-            $ext = $file->getClientOriginalExtension();
-            $filename = "u-{$user->id}." . $ext;
+            $filename = "u-{$user->id}." . $file->getClientOriginalExtension();
 
-            $path = $file->storeAs('public/fotos_perfil', $filename);
+            $path = $file->storeAs('fotos_perfil', $filename, 'public');
 
-            $user->avatar = "fotos_perfil/{$filename}";
+            $user->avatar = $path;
             $user->save();
         }
 
         auth()->login($user);
-
-        Auth::login($user);
         return redirect()->route('user.show')->with('success', 'Registro completado correctamente.');
     }
 

@@ -9,8 +9,13 @@
     @endauth
 
     @guest
-        <a href="{{ route('login') }}" class="btn btn-outline-success">
-            <i class="fas fa-sign-in-alt"></i>
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('register') }}" class="btn btn-outline-primary">
+                <i class="fas fa-user-plus"></i>
+            </a>
+            <a href="{{ route('login') }}" class="btn btn-outline-success">
+                <i class="fas fa-sign-in-alt"></i>
+            </a>
+        </div>
     @endguest
 </header>

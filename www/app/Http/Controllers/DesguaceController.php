@@ -15,7 +15,17 @@ class DesguaceController extends Controller
 
     public function show($id)
     {
-        $desguace = Desguace::findOrFail($id);
+        $desguace = Desguace::with('articulos')->findOrFail($id);
         return view('desguaces.show', compact('desguace'));
+    }
+
+    public function showCreate()
+    {
+        return view('desguaces.create');
+    }
+
+    public function doCreate()
+    {
+
     }
 }

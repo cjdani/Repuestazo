@@ -7,21 +7,24 @@ use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('inicio');
-})->name('inicio');
+    })->name('inicio');
 
 //Articulos
 Route::get('/articulos',
     [ArticuloController::class, 'index']
     )->name('articulos.index');
 
-Route::get('/articulos/{id}',
-    [ArticuloController::class, 'show']
-    )->name('articulos.show');
-
 //Desguaces
 Route::get('/desguaces',
     [DesguaceController::class, 'index']
     )->name('desguaces.index');
+
+Route::get('/desguaces/create',
+    [DesguaceController::class, 'showCreate']
+    )->name('desguaces.create');
+
+Route::post('/desguaces/create',
+    [DesguaceController::class, 'doCreate']);
 
 Route::get('/desguaces/{id}',
     [DesguaceController::class, 'show']
@@ -31,11 +34,17 @@ Route::get('/desguaces/{id}',
 Route::get('/usuario',
     [UserController::class, 'show']
     )->name('user.show');
+Route::get('/usuario/{id}',
+    [UserController::class, 'showUserDetails']
+    )->name('user.details');
+Route::get('/usuarios',
+    [UserController::class, 'index']
+    )->name('user.index');
 
 //Autenticación
 Route::get('/register',
     [UserController::class, 'showRegister']
-)->name('register');
+        )->name('register');
 
 Route::post('/register',
     [UserController::class, 'doRegister']
@@ -43,7 +52,7 @@ Route::post('/register',
 
 Route::get('/login',
     [UserController::class, 'showLogin']
-)->name('login');
+    )->name('login');
 
 Route::post('/login',
     [UserController::class, 'doLogin']
@@ -51,4 +60,4 @@ Route::post('/login',
 
 Route::get('/logout',
     [UserController::class, 'logout']
-)->name('logout');
+    )->name('logout');

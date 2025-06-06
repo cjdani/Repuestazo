@@ -7,7 +7,7 @@
 
     @auth
         <a href="{{ route('user.show') }}" class="d-flex align-items-center mb-4 text-decoration-none text-white">
-            <img src="{{ asset('storage/' . Auth::user()->avatar  ) }}" class="rounded-circle me-2" width="50" height="50" alt="Avatar">
+            <img src="{{ asset('storage/' . Auth::user()->avatar ) }}" class="rounded-circle me-2" width="50" height="50" alt="Avatar">
             <span class="nav-text">{{ Auth::user()->name }}</span>
         </a>
     @endauth
@@ -29,7 +29,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#{{-- route('user.index') --}}">
+            <a class="nav-link" href="{{ route('user.index') }}">
                 <i class="fas fa-users"></i> <span class="nav-text ms-2">Usuarios</span>
             </a>
         </li>
