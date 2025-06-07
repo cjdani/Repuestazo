@@ -9,9 +9,9 @@ class Desguace extends Model
 {
     use HasFactory;
 
-    public function empleados()
+    public function user()
     {
-        return $this->hasMany(User::class);
+        return $this->hasOne(User::class);
     }
 
     public function articulos()

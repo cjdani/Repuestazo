@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -19,6 +20,78 @@ class UserController extends Controller
     {
         $users = User::with('desguace')->get();
         return view('users.index', compact('users'));
+    }
+
+    public function showEditSelf()
+    {
+        $user = auth()->user();
+        return view('users.edit', compact('user'));
+    }
+
+    public function showEdit($id)
+    {
+        $user = User::findOrFail($id);
+        return view('users.edit', compact('user'));
+    }
+
+    public function doEditSelf(Request $request)
+    {
+        $user =  auth()->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'avatar' => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $filename = "u-{$user->id}." . $file->getClientOriginalExtension();
+            if ($user->avatar !== 'fotos_perfil/default.svg') {
+                Storage::delete($user->avatar);
+            }
+            $path = $file->storeAs('fotos_perfil', $filename, 'public');
+
+            $user->avatar = $path;
+        }
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->save();
+
+        return redirect()->route('user.show')->with('success', 'Usuario actualizado correctamente.');
+    }
+
+    public function doEdit(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'avatar' => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $filename = "u-{$user->id}." . $file->getClientOriginalExtension();
+            if ($user->avatar !== 'fotos_perfil/default.svg') {
+                Storage::delete($user->avatar);
+            }
+            $path = $file->storeAs('fotos_perfil', $filename, 'public');
+
+            $user->avatar = $path;
+        }
+
+        if ($user->role !== 'empleado') {
+            $user->role = $request->has('is_admin') ? 'admin' : 'cliente';
+        }
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->save();
+
+        return redirect()->route('user.details', $user->id)->with('success', 'Usuario actualizado correctamente.');
     }
 
     public function showUserDetails($id)
@@ -88,6 +161,46 @@ class UserController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        return redirect()->route('inicio');
+    }
+
+    public function doDeleteSelf(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'empleado') {
+            $desguace = $user->desguace;
+            $articulos = $desguace->articulos;
+            foreach ($articulos as $articulo) {
+                Storage::delete($articulo->imagen);
+                $articulo->delete();
+            }
+            Storage::delete($desguace->imagen);
+            $desguace->delete();
+        }
+
+        $user->delete();
+
+        return redirect()->route('inicio');
+    }
+
+    public function doDelete(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->role === 'empleado') {
+            $desguace = $user->desguace;
+            $articulos = $desguace->articulos;
+            foreach ($articulos as $articulo) {
+                Storage::delete($articulo->imagen);
+                $articulo->delete();
+            }
+            Storage::delete($desguace->imagen);
+            $desguace->delete();
+        }
+
+        $user->delete();
 
         return redirect()->route('inicio');
     }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Crear Desguace')
+@section('title', 'Editar Desguace')
 
 @section('content')
     <div class="container py-5">
@@ -8,44 +8,45 @@
             <div class="col-md-8">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h2 class="card-title text-center mb-4">Crear Desguace</h2>
+                        <h2 class="card-title text-center mb-4">Editar Desguace</h2>
 
-                        <form method="POST" action="{{ route('desguaces.create') }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ $isAdmin ? route('desguaces.edit', $desguace->id) : route('desguaces.editSelf') }}" enctype="multipart/form-data">
                             @csrf
 
                             <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre del Desguace</label>
-                                <input type="text" name="nombre" id="nombre" class="form-control" required>
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" name="nombre" id="nombre" class="form-control" value="{{ old('nombre', $desguace->nombre) }}" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="telefono" class="form-label">Teléfono</label>
-                                <input type="tel" name="telefono" id="telefono" class="form-control" required>
+                                <input type="tel" name="telefono" id="telefono" class="form-control" value="{{ old('telefono', $desguace->telefono) }}" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email de Contacto</label>
-                                <input type="email" name="email" id="email" class="form-control" required>
+                                <input type="email" name="email" id="email" class="form-control" value="{{ old('email', $desguace->email) }}" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="direccion" class="form-label">Dirección</label>
-                                <input type="text" name="direccion" id="direccion" class="form-control" required>
+                                <input type="text" name="direccion" id="direccion" class="form-control" value="{{ old('direccion', $desguace->direccion) }}" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="ciudad" class="form-label">Ciudad</label>
-                                <input type="text" name="ciudad" id="ciudad" class="form-control" required>
+                                <input type="text" name="ciudad" id="ciudad" class="form-control" value="{{ old('ciudad', $desguace->ciudad) }}" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="provincia" class="form-label">Provincia</label>
-                                <input type="text" name="provincia" id="provincia" class="form-control" required>
+                                <input type="text" name="provincia" id="provincia" class="form-control" value="{{ old('provincia', $desguace->provincia) }}" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="imagen" class="form-label">Imagen del Desguace</label>
-                                <input type="file" name="imagen" id="imagen" class="form-control" accept="image/*" required>
+                                <input type="file" name="imagen" id="imagen" class="form-control" accept="image/*">
+                                <small>No introduzca si no quiere cambiar la imagen</small>
                             </div>
 
                             <div class="mb-3">
@@ -56,8 +57,8 @@
                                 </button>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-plus me-1"></i> Crear Desguace
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-save me-1"></i> Guardar Cambios
                             </button>
                         </form>
                     </div>
@@ -74,8 +75,8 @@
 
 @section('scripts')
     <script>
-        const defaultLat = 40.4168;
-        const defaultLng = -3.7038;
+        const defaultLat = {{ explode(',', $desguace->lat_lon)[0] }};
+        const defaultLng = {{ explode(',', $desguace->lat_lon)[1] }};
 
         const map = L.map('map').setView([defaultLat, defaultLng], 13);
 

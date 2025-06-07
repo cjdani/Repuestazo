@@ -12,9 +12,9 @@
                 <tr>
                     <th>Foto</th>
                     <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Rol</th>
-                    <th>Desguace</th>
+                    <th class="d-none d-xl-table-cell">Email</th>
+                    <th class="d-none d-lg-table-cell">Rol</th>
+                    <th class="d-none d-xl-table-cell">Desguace</th>
                     <th>Acciones</th>
                 </tr>
                 </thead>
@@ -29,9 +29,9 @@
                                  class="rounded-circle object-fit-cover">
                         </td>
                         <td>{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ ucfirst($user->role) }}</td>
-                        <td>
+                        <td class="d-none d-xl-table-cell">{{ $user->email }}</td>
+                        <td class="d-none d-lg-table-cell">{{ ucfirst($user->role) }}</td>
+                        <td class="d-none d-xl-table-cell">
                             @if ($user->desguace)
                                 <a href="{{ route('desguaces.show', $user->desguace->id) }}">
                                     {{ $user->desguace->nombre }}
@@ -40,21 +40,22 @@
                                 —
                             @endif
                         </td>
-                        <td>
-                            <a href="{{ route('user.details', $user->id) }}" class="btn btn-sm btn-primary me-2">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{{-- route('user.edit', $user->id) --}}" class="btn btn-sm btn-warning me-2">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{-- route('user.destroy', $user->id) --}}" method="POST" class="d-inline"
-                                  onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
+                        <td class="align-middle px-3">
+                            <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-2 h-100">
+                                <a href="{{ route('user.details', $user->id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('user.delete', $user->id) }}" method="POST" class="d-inline"
+                                      onsubmit="return confirm('¿Estás seguro de eliminar este usuario{{ $user->desguace ? '?, se eliminará el desguace asociado y sus artículos' : '?' }}');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @endforeach

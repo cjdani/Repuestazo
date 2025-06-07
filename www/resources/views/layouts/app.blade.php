@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/logo.svg') }}">
+    @yield('head')
     <style>
         .sidebar {
             width: 260px;
@@ -26,6 +28,17 @@
         }
         .sidebar.collapsed .nav-text {
             display: none;
+        }
+
+        .sidebar img.avatar-fixed {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .logo-margin-fix {
+            margin-right: 0 !important;
         }
     </style>
 </head>

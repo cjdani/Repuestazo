@@ -11,7 +11,7 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow-sm">
                         <img src="{{ asset( 'storage/' . $desguace->imagen ) }}"
-                             class="card-img-top" alt="Imagen del desguace" style="object-fit: cover; height: 200px;">
+                             class="card-img-top object-fit-cover" alt="Imagen del desguace" height="200px">
 
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">{{ $desguace->nombre }}</h5>
