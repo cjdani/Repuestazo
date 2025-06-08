@@ -10,6 +10,17 @@
                     <div class="card-body">
                         <h2 class="card-title text-center mb-4">Crear Artículo</h2>
 
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <h5 class="fw-bold">Se encontraron errores:</h5>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <form method="POST" action="{{ route('articulos.create') }}" enctype="multipart/form-data">
                             @csrf
 
@@ -21,11 +32,6 @@
                             <div class="mb-3">
                                 <label for="descripcion" class="form-label">Descripción</label>
                                 <textarea name="descripcion" id="descripcion" class="form-control" rows="4" required></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="categoria" class="form-label">Categoría</label>
-                                <input type="text" name="categoria" id="categoria" class="form-control" required>
                             </div>
 
                             <div class="mb-3">
@@ -50,7 +56,7 @@
 
                             <div class="mb-3">
                                 <label for="imagen" class="form-label">Imagen del Artículo</label>
-                                <input type="file" name="imagen" id="imagen" class="form-control" accept="image/*" required>
+                                <input type="file" name="imagen" id="imagen" class="form-control" accept="image/*">
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100">

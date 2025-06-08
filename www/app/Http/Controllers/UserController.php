@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Desguace;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -16,11 +19,47 @@ class UserController extends Controller
         return view('users.show', compact('user'));
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('desguace')->get();
-        return view('users.index', compact('users'));
+        $validated = $request->validate([
+            'name'         => 'nullable|string|max:255',
+            'email'        => 'nullable|email|max:255',
+            'role'         => 'nullable|in:cliente,empleado,admin',
+            'desguace_id'  => 'nullable|exists:desguaces,id',
+        ], [
+            'name.string'         => 'El nombre debe ser un texto válido.',
+            'name.max'            => 'El nombre no puede tener más de 255 caracteres.',
+            'email.email'         => 'Introduce un email válido.',
+            'email.max'           => 'El email no puede superar los 255 caracteres.',
+            'role.in'             => 'El rol seleccionado no es válido.',
+            'desguace_id.exists'  => 'El desguace seleccionado no existe.',
+        ]);
+
+        $query = User::with('desguace');
+
+        if (!empty($validated['name'])) {
+            $query->where('name', 'like', '%' . $validated['name'] . '%');
+        }
+
+        if (!empty($validated['email'])) {
+            $query->where('email', 'like', '%' . $validated['email'] . '%');
+        }
+
+        if (!empty($validated['role'])) {
+            $query->where('role', $validated['role']);
+        }
+
+        if (!empty($validated['desguace_id'])) {
+            $query->where('desguace_id', $validated['desguace_id']);
+        }
+
+        $users = $query->get();
+        $roles = ['cliente', 'empleado', 'admin' ];
+        $desguaces = Desguace::all();
+
+        return view('users.index', compact('users', 'roles', 'desguaces'));
     }
+
 
     public function showEditSelf()
     {
@@ -36,12 +75,34 @@ class UserController extends Controller
 
     public function doEditSelf(Request $request)
     {
-        $user =  auth()->user();
+        $user = auth()->user();
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'avatar' => 'nullable|image|max:2048',
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[\pL\s\-]+$/u',
+            ],
+            'email' => [
+                'required',
+                'email:rfc,dns',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+            'avatar' => 'nullable|image|mimes:jpeg,jpg,png,svg|max:2048',
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'name.max' => 'El nombre no puede superar los 20 caracteres.',
+            'name.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
+
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Introduce un correo electrónico válido.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+
+            'avatar.image' => 'El archivo debe ser una imagen.',
+            'avatar.mimes' => 'Solo se permiten imágenes jpeg, jpg, png o svg.',
+            'avatar.max' => 'La imagen no debe superar los 2MB.',
         ]);
 
         if ($request->hasFile('avatar')) {
@@ -51,12 +112,11 @@ class UserController extends Controller
                 Storage::delete($user->avatar);
             }
             $path = $file->storeAs('fotos_perfil', $filename, 'public');
-
             $user->avatar = $path;
         }
 
-        $user->name = $request->name;
-        $user->email = $request->email;
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
         $user->save();
 
         return redirect()->route('user.show')->with('success', 'Usuario actualizado correctamente.');
@@ -66,10 +126,32 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'avatar' => 'nullable|image|max:2048',
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[\pL\s\-]+$/u',
+            ],
+            'email' => [
+                'required',
+                'email:rfc,dns',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+            'avatar' => 'nullable|image|mimes:jpeg,jpg,png,svg|max:2048',
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'name.max' => 'El nombre no puede superar los 20 caracteres.',
+            'name.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
+
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Introduce un correo electrónico válido.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+
+            'avatar.image' => 'El archivo debe ser una imagen.',
+            'avatar.mimes' => 'Solo se permiten imágenes jpeg, jpg, png o svg.',
+            'avatar.max' => 'La imagen no debe superar los 2MB.',
         ]);
 
         if ($request->hasFile('avatar')) {
@@ -79,7 +161,6 @@ class UserController extends Controller
                 Storage::delete($user->avatar);
             }
             $path = $file->storeAs('fotos_perfil', $filename, 'public');
-
             $user->avatar = $path;
         }
 
@@ -87,8 +168,8 @@ class UserController extends Controller
             $user->role = $request->has('is_admin') ? 'admin' : 'cliente';
         }
 
-        $user->name = $request->name;
-        $user->email = $request->email;
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
         $user->save();
 
         return redirect()->route('user.details', $user->id)->with('success', 'Usuario actualizado correctamente.');
@@ -108,10 +189,43 @@ class UserController extends Controller
     public function doRegister(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|confirmed|min:6',
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048'
+            'name' => [
+                'required',
+                'string',
+                'min:5',
+                'max:20',
+                'regex:/^[\pL\s\-]+$/u',
+            ],
+            'email' => 'required|email:rfc,dns|unique:users,email',
+
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:20',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
+            ],
+
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'name.min' => 'El nombre debe tener al menos 5 caracteres.',
+            'name.max' => 'El nombre no debe exceder los 20 caracteres.',
+            'name.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
+
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Introduce un correo electrónico válido.',
+            'email.unique' => 'Este correo ya está registrado.',
+
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.regex' => 'La contraseña debe contener al menos una mayúscula, una minúscula, un número y un símbolo.',
+
+            'avatar.image' => 'El archivo debe ser una imagen.',
+            'avatar.mimes' => 'Solo se permiten imágenes jpeg, png, jpg o svg.',
+            'avatar.max' => 'La imagen no debe superar los 2MB.',
         ]);
 
         $user = User::create([
@@ -126,9 +240,7 @@ class UserController extends Controller
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
             $filename = "u-{$user->id}." . $file->getClientOriginalExtension();
-
             $path = $file->storeAs('fotos_perfil', $filename, 'public');
-
             $user->avatar = $path;
             $user->save();
         }
@@ -136,6 +248,7 @@ class UserController extends Controller
         auth()->login($user);
         return redirect()->route('user.show')->with('success', 'Registro completado correctamente.');
     }
+
 
     public function showLogin()
     {

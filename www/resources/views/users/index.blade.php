@@ -6,6 +6,53 @@
     <div class="container">
         <h1 class="mb-4">Listado de Usuarios</h1>
 
+        <form method="GET" class="mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="name" class="form-label">Nombre</label>
+                    <input type="text" name="name" id="name" class="form-control" value="{{ request('name') }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="text" name="email" id="email" class="form-control" value="{{ request('email') }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label for="role" class="form-label">Rol</label>
+                    <select name="role" id="role" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role }}" @selected(request('role') === $role)>
+                                {{ ucfirst($role) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="desguace_id" class="form-label">Desguace</label>
+                    <select name="desguace_id" id="desguace_id" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach ($desguaces as $desguace)
+                            <option value="{{ $desguace->id }}" @selected(request('desguace_id') == $desguace->id)>
+                                {{ $desguace->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-12 d-flex justify-content-end gap-2">
+                    <a href="{{ route('user.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Limpiar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-1"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+        </form>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle text-center">
                 <thead class="table-dark">

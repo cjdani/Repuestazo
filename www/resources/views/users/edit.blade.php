@@ -8,8 +8,20 @@
             <div class="col-md-8">
                 <div class="card shadow-sm p-4">
                     <h2 class="mb-4 text-center">Editar Usuario</h2>
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <h5 class="fw-bold">Se encontraron errores:</h5>
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form method="POST" action="@if(Auth::user()->id === $user->id) {{ route('user.editSelf') }} @else {{ route('user.edit', $user->id) }} @endif">
-                        @csrf   
+                        @csrf
 
                         <div class="d-flex flex-column align-items-center gap-2 mb-4">
                             <div id="profile-container" class="position-relative d-inline-block">
@@ -36,7 +48,7 @@
                                    value="{{ old('email', $user->email) }}" required>
                         </div>
 
-                        @if($user->role !== 'empleado')
+                        @if(Auth::user()->role === 'admin' && $user->role !== 'empleado')
                             <div class="mb-3 form-check">
                                 <input type="checkbox"
                                        class="form-check-input"

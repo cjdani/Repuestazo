@@ -12,7 +12,6 @@ class Articulo extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'categoria',
         'marca',
         'modelo',
         'anio',

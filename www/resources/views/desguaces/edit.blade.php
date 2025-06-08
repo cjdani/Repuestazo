@@ -10,6 +10,17 @@
                     <div class="card-body">
                         <h2 class="card-title text-center mb-4">Editar Desguace</h2>
 
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <h5 class="fw-bold">Se encontraron errores:</h5>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <form method="POST" action="{{ $isAdmin ? route('desguaces.edit', $desguace->id) : route('desguaces.editSelf') }}" enctype="multipart/form-data">
                             @csrf
 

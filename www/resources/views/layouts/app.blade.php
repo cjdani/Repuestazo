@@ -56,11 +56,18 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('toggle-menu').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('collapsed');
+        const sidebar = document.getElementById('sidebar');
+
+        if (window.innerWidth < 768) {
+            sidebar.classList.add('collapsed');
+        }
+
+        document.getElementById('toggle-menu')?.addEventListener('click', function () {
+            sidebar.classList.toggle('collapsed');
         });
     });
 </script>
+
 
 @yield('scripts')
 
